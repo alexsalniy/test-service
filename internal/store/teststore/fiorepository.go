@@ -2,7 +2,6 @@ package teststore
 
 import (
 	"github.com/alexsalniy/test-service/internal/app/apiserver/model"
-	"github.com/google/uuid"
 )
 
 type ExtFIORepository struct {
@@ -10,8 +9,7 @@ type ExtFIORepository struct {
 	fio   map[int]*model.ExtendedFIO
 }
 
-// FindByID implements store.ExtendedFIORepository.
-func (*ExtFIORepository) FindByID(uuid.UUID) (*model.ExtendedFIO, error) {
+func (*ExtFIORepository) FindByID(e *model.ExtendedFIO) error {
 	panic("unimplemented")
 }
 

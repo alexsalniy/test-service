@@ -18,12 +18,12 @@ func TestFIORepository_Create(t *testing.T) {
 
 func TestFIORepository_FindByEmail(t *testing.T) {
 	s := teststore.New()
-	e1 := model.TestExtFIO(t)
-	_, err := s.ExtFIO().FindByID(e1.ID)
+	e := model.TestExtFIO(t)
+	err := s.ExtFIO().FindByID(e)
 	assert.EqualError(t, err, store.ErrRecordNotFound.Error())
 
-	s.ExtFIO().Create(e1)
-	e2, err := s.ExtFIO().FindByID(e1.ID)
+	s.ExtFIO().Create(e)
+	err = s.ExtFIO().FindByID(e)
 	assert.NoError(t, err)
-	assert.NotNil(t, e2)
+	assert.NotNil(t, e)
 }

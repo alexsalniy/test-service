@@ -1,4 +1,4 @@
-package kafka
+package apiserver
 
 import (
 	"encoding/json"
@@ -7,27 +7,28 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"sync"
 
-	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"github.com/alexsalniy/test-service/internal/app/kafka/utils"
 	"github.com/alexsalniy/test-service/internal/app/apiserver/model"
-	"github.com/alexsalniy/test-service/internal/store/sqlstore"
+	"github.com/alexsalniy/test-service/internal/app/kafka/utils"
+	"github.com/alexsalniy/test-service/internal/store"
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
-type ExtFIORepo struct {
-	store *sqlstore.ExtFIORepository
+type fioStore struct {
+	store store.Store
 }
 
 var FioList = make([][]byte, 0)
 
-func Consumer(s *ExtFIORepo) {
-	// func (s *server) consumer() {
-	if len(os.Args) != 2 {
-		fmt.Fprintf(os.Stderr, "Usage: %s <config-file-path>\n", os.Args[0])
-		os.Exit(1)
+func Consumer(store store.Store, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	s :=  &fioStore{
+		store:	store,
 	}
 
-	configFile := os.Args[1]
+	configFile := "getting-started.properties"
 	conf := utils.ReadConfig(configFile)
 	conf["group.id"] = "kafka-go-getting-started"
 	conf["auto.offset.reset"] = "earliest"
@@ -63,7 +64,7 @@ func Consumer(s *ExtFIORepo) {
 			fmt.Printf("Consumed event from topic %s: key = %-10s value = %s\n",
 				*ev.TopicPartition.Topic, string(ev.Key), string(ev.Value))		
 
-			var newFIO model.FIO
+			var newFIO model.ExtendedFIO
 			readerr := json.Unmarshal(ev.Value, &newFIO)
 			if readerr != nil {
 				fmt.Printf("Some error")
@@ -75,7 +76,7 @@ func Consumer(s *ExtFIORepo) {
 				Patronymic: newFIO.Patronymic,
 			}
 
-			if err := s.store.Create(e); err != nil {
+			if err := s.store.ExtFIO().Create(e); err != nil {
 				fmt.Println(err)
 			}
 				

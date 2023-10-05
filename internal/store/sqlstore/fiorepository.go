@@ -67,22 +67,21 @@ func (r *ExtFIORepository) Create(e *model.ExtendedFIO) error {
 	return nil
 }
 
-func (r *ExtFIORepository) FindByID(id uuid.UUID) (*model.ExtendedFIO, error) {
-	e := &model.ExtendedFIO{}
+func (r *ExtFIORepository) FindByID(e *model.ExtendedFIO) error {
 	if err := r.store.db.QueryRow(`
 	SELECT id, name, surname, patronymic, age, gender, gender_probability
 	FROM fio
-	WHERE id = $1`, id,
+	WHERE id = $1`, e.ID,
 ).Scan(
-	e.ID, 
-	e.Name,
-	e.Surname,
-	e.Patronymic,
-	e.Age,
-	e.Gender,
-	e.Probability,
+	&e.ID, 
+	&e.Name,
+	&e.Surname,
+	&e.Patronymic,
+	&e.Age,
+	&e.Gender,
+	&e.Probability,
 ); err != nil {
-	return nil, err
+	return err
 }
-	return e, nil
+	return nil
 }

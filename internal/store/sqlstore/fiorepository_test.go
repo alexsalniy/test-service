@@ -24,10 +24,10 @@ func TestFIORepository_FindByID(t *testing.T) {
 	db, teardown := sqlstore.TestingDB(t, databaseURL)
 	defer teardown("fio")
 
-	id := uuid.New()
+	e := model.TestExtFIO(t)
 
 	s := sqlstore.New(db)
-	_, err := s.ExtFIO().FindByID(id)
+	err := s.ExtFIO().FindByID(e)
 	assert.Error(t, err)
 
 	s.ExtFIO().Create(&model.ExtendedFIO{
@@ -35,7 +35,7 @@ func TestFIORepository_FindByID(t *testing.T) {
 		Name: "Name",
 	})
 
-	e, err := s.ExtFIO().FindByID(id)
+	err = s.ExtFIO().FindByID(e)
 	assert.NoError(t, err)
 	assert.NotNil(t, e)
 

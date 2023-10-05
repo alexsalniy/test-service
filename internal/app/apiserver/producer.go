@@ -1,4 +1,4 @@
-package kafka
+package apiserver
 
 import (
 	"fmt"
@@ -17,11 +17,8 @@ var patronymics = [...]string{"Sergeevich", "Mihalich", "Alexandrovich", "Dmitri
 
 func Producer() {
 	
-	if len(os.Args) != 2 {
-		fmt.Fprintf(os.Stderr, "Usage: %s <config-file-path>\n", os.Args[0])
-		os.Exit(1)	
-	} 
-	configFile := os.Args[1]
+	configFile := "getting-started.properties"
+
 	conf := utils.ReadConfig(configFile)
 
 	topic := "purchases"
@@ -45,7 +42,7 @@ func Producer() {
 		}
 	}()
 
-	for n := 0; n < 5; n++ {
+	for n := 0; n < 10; n++ {
 		name := names[rand.Intn(len(names))]
 		surname := surnames[rand.Intn(len(surnames))]
 		patronymic := patronymics[rand.Intn(len(patronymics))]
@@ -66,7 +63,6 @@ func Producer() {
 		}
 		jsonFio, err := json.Marshal(fio)
   	if err != nil {
-    	fmt.Println(err)
 			return
 		}
 		p.Produce(&kafka.Message{
